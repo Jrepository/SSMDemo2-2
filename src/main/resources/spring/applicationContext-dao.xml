@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:task="http://www.springframework.org/schema/task" 
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans-4.2.xsd 
+		http://www.springframework.org/schema/mvc 
+		http://www.springframework.org/schema/mvc/spring-mvc-4.2.xsd 
+		http://www.springframework.org/schema/context 
+		http://www.springframework.org/schema/context/spring-context-4.2.xsd 
+		http://www.springframework.org/schema/aop 
+		http://www.springframework.org/schema/aop/spring-aop-4.2.xsd 
+		http://www.springframework.org/schema/tx 
+		http://www.springframework.org/schema/tx/spring-tx-4.2.xsd
+		http://www.springframework.org/schema/task
+   		http://www.springframework.org/schema/task/spring-task-4.2.xsd">
+
+	<!-- 配置 读取properties文件 jdbc.properties -->
+	<context:property-placeholder location="classpath:springConfig-jdbc.properties" />
+
+	<!-- 配置 数据源 -->
+	<bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+		<!-- 驱动 -->
+		<property name="driverClassName" value="${jdbc.oracle.driverClassName}" />
+		<!-- url -->
+		<property name="url" value="${jdbc.oracle.url}" />
+		<!-- 用户名 -->
+		<property name="username" value="${jdbc.oracle.username}" />
+		<!-- 密码 -->
+		<property name="password" value="${jdbc.oracle.password}" />
+		
+		<!-- <property name="filters" value="${jdbc.filters}" /> -->
+        <!-- 最大并发连接数 (连接池最大数量)-->  
+        <property name="maxActive" value="${jdbc.maxActive}" />  
+        <!-- 初始化连接数量(大小) -->  
+        <property name="initialSize" value="${jdbc.initialSize}" /> 
+        <!-- 连接池最大空闲 -->  
+	    <property name="maxIdle" value="${jdbc.maxIdle}"></property>  
+        <!-- 最小空闲连接数 -->  
+        <property name="minIdle" value="${jdbc.minIdle}" />    
+        <!-- 配置获取连接等待超时的时间(获取连接最大等待时间 ) -->  
+        <property name="maxWait" value="3000" />  
+        <!-- 配置间隔多久才进行一次检测，检测需要关闭的空闲连接，单位是毫秒 -->  
+        <property name="timeBetweenEvictionRunsMillis" value ="3000" />  
+        <!-- 配置一个连接在池中最小生存的时间，单位是毫秒 -->  
+        <property name="minEvictableIdleTimeMillis" value ="3000" />    
+        <property name="maxOpenPreparedStatements" value ="20" />  
+        <!-- 打开 removeAbandoned 功能 -->  
+        <property name="removeAbandoned" value="true" />  
+        <!-- 1800 秒，也就是 30 分钟 -->  
+        <property name="removeAbandonedTimeout" value ="180" />
+       	<!-- 打开PSCache，并且指定每个连接上PSCache的大小 -->  
+   	 	<property name="poolPreparedStatements" value="false" />  
+	 	<property name="maxPoolPreparedStatementPerConnectionSize" value="20" />  
+        <!-- 关闭 abanded 连接时输出错误日志 -->     
+        <!-- <property name="logAbandoned" value="${logAbandoned}" />   -->
+	</bean>
+
+	<!-- 配置 Mybatis的工厂 -->
+	<bean class="org.mybatis.spring.SqlSessionFactoryBean">
+		<!-- 数据源 -->
+		<property name="dataSource" ref="dataSource" />
+		<!-- 配置Mybatis的核心 配置文件所在位置 -->
+		<property name="configLocation" value="classpath:mybatis/SqlMapConfig.xml" />
+		<!-- 配置pojo别名 -->
+		<property name="typeAliasesPackage" value="indi.ssm.pojo"></property>
+	</bean>
+
+	<!-- 配置 1：原始Dao开发 接口实现类 Mapper.xml 三个 2：接口开发 接口 不写实现类 Mapper.xml 二个 （UserDao、ProductDao 
+		、BrandDao。。。。。。。） 3：接口开发、并支持扫描 cn.itcast.core.dao(UserDao。。。。。） 写在此包下即可被扫描到 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="indi.ssm.dao" />
+	</bean>
+
+</beans>
